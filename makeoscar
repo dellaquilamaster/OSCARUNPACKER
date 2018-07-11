@@ -1,0 +1,50 @@
+########################################
+# Makefile for
+# the Oscar UnPacker 
+##########################################
+CPP=g++ -std=c++11
+SYSLIB = -lz
+ROOTLIB = `root-config --cflags --libs`
+CPPFLAG = -O3 -I `root-config --incdir` 
+
+PROG = ReadOscar
+SOURCE = ReadOscar.cpp
+
+OBJ = OscarAnalysisVector.o FAIRTree.o TRootEvent.o TRootClassEvent.o OAnalyzer.o OIdentification.o OCalibration.o OGeometry.o
+
+all: $(PROG) 
+
+$(PROG): $(SOURCE) $(OBJ)
+	$(CPP) $(CPPFLAG) -o $(PROG) $(SOURCE) $(OBJ) $(SYSLIB) $(ROOTLIB)
+
+OscarAnalysisVector.o: OscarAnalysisVector.cc OscarAnalysisVector.h
+	$(CPP) $(CPPFLAG) -c OscarAnalysisVector.cc
+
+FAIRTree.o: FAIRTree.cc FAIRTree.h
+	$(CPP) $(CPPFLAG) -c FAIRTree.cc	
+
+TRootEvent.o: TRootEvent.cc TRootEvent.h
+	$(CPP) $(CPPFLAG) -c TRootEvent.cc
+        
+OAnalyzer.o : OAnalyzer.cc OAnalyzer.h
+	$(CPP) $(CPPFLAG) -c OAnalyzer.cc
+	
+OIdentification.o : OIdentification.cc OIdentification.h
+	$(CPP) $(CPPFLAG) -c OIdentification.cc
+	
+OCalibration.o : OCalibration.cc OCalibration.h
+	$(CPP) $(CPPFLAG) -c OCalibration.cc
+	
+OGeometry.o : OGeometry.cc OGeometry.h
+	$(CPP) $(CPPFLAG) -c OGeometry.cc	
+	
+	
+TRootClassEvent.o: LinkDef.h TRootEvent.h
+	rootcint -f TRootClassEvent.cxx -c TRootEvent.h LinkDef.h && \
+	$(CPP) $(CPPFLAG) -c TRootClassEvent.cxx && \
+	$(CPP) $(CPPFLAG) -fpic -shared -o TRootClassEvent.so TRootClassEvent.cxx
+	
+clean:
+	@rm *.o
+	@rm *.so
+	@rm $(PROG)
